@@ -22,47 +22,18 @@ const CHUNK_SIZE = 1200;
 const CHUNK_OVERLAP = 200;
 
 // Your existing project knowledge.
+
 const SAMPLE_DOCUMENTS = [
-  {
-    source: 'project-profile.txt',
-    category: 'profile',
-    text:
-      'Chirayu Agrawal is pursuing a B.Tech in Computer Science ' +
-      'and Engineering at MIT World Peace University (2024-2028), ' +
-      'with an interest in self-supervised continual domain adaptation.'
-  },
-  {
-    source: 'skills.txt',
-    category: 'skills',
-    text:
-      'The project profile describes experience building full-stack ' +
-      'web applications with React and Node.js, and cloud-native ' +
-      'microservices using Docker and Kubernetes.'
-  },
   {
     source: 'rag-project.txt',
     category: 'project',
     text:
-      'The ccd-microservice project implements a Retrieval-Augmented ' +
-      'Generation (RAG) pipeline using Express, ChromaDB, Ollama, ' +
-      'the Phi-3 language model, and the nomic-embed-text embedding model. ' +
-      'The API accepts questions, retrieves relevant document chunks, ' +
-      'and passes the retrieved context to Phi-3 to generate an answer.'
-  },
-  {
-    source: 'computer-vision.txt',
-    category: 'projects',
-    text:
-      'A computer vision project uses YOLO for number-plate detection ' +
-      'and classification, with a focus on distinguishing green Indian ' +
-      'electric-vehicle number plates from non-EV number plates.'
-  },
-  {
-    source: 'college.txt',
-    category: 'education',
-    text:
-      'MIT World Peace University is located in Pune, Maharashtra, India, ' +
-      'and offers B.Tech engineering programs.'
+      'The Cloud-Native RAG Microservice Pipeline implements a ' +
+      'Retrieval-Augmented Generation question-answering service ' +
+      'using Node.js, Express, ChromaDB, Ollama, Phi-3, and ' +
+      'the nomic-embed-text embedding model. The API retrieves ' +
+      'relevant document chunks and supplies the context to Phi-3 ' +
+      'to generate an answer.'
   }
 ];
 
@@ -223,10 +194,17 @@ async function runIngestion() {
   // Prepare all documents before replacing the collection.
   const folderDocuments = await loadDocumentsFromFolder();
 
-  const documents = [
-    ...SAMPLE_DOCUMENTS,
-    ...folderDocuments
-  ];
+const documents = [
+  ...SAMPLE_DOCUMENTS,
+  ...folderDocuments
+].filter((document) => {
+  const source = document.source.replace(/\\/g, '/').toLowerCase();
+
+  return (
+    source === 'rag-project.txt' ||
+    source.startsWith('documents/')
+  );
+});
 
   const { ids, texts, metadatas } = prepareChunks(documents);
 

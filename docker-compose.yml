@@ -8,6 +8,8 @@ services:
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - CHROMA_HOST=http://chromadb:8000
+    volumes:
+      - ./documents:/app/documents:ro
     depends_on:
       - ollama
       - chromadb
