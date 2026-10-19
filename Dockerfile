@@ -1,20 +1,27 @@
 # --- Stage 1: Build Stage ---
 FROM node:18-alpine AS builder
+
 WORKDIR /app
+
+# Copy dependency definitions
 COPY package*.json ./
+
+# Install production dependencies
 RUN npm install --omit=dev
 
 # --- Stage 2: Production Run Stage ---
 FROM node:18-alpine AS runner
+
 WORKDIR /app
 
-# Copy production dependencies and source files securely
+# Copy node modules and source files from builder stage
 COPY --from=builder /app/node_modules ./node_modules
 COPY package*.json ./
 COPY server.js ./
+COPY ingest.js ./
 
-# Run container as a non-root user for security best practices
-USER node
-
+# Expose port for the Express server
 EXPOSE 3000
-CMD ["npm", "run", "start:prod"]
+
+# Start the Node.js microservice
+CMD ["npm", "start"]
