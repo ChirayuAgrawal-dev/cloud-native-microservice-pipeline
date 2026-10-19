@@ -6,70 +6,57 @@ const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const CHROMA_URL = process.env.CHROMA_URL || 'http://localhost:8000';
+const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://ollama:11434';
+const CHROMA_HOST = process.env.CHROMA_HOST || 'http://chromadb:8000';
 
-const chromaClient = new ChromaClient({ path: CHROMA_URL });
+const chroma = new ChromaClient({ path: CHROMA_HOST });
 
-// 1. Health Check Endpoint (Used by Kubernetes Liveness & Readiness Probes)
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
-});
+// Define matching embedding function structure
+const customEmbeddingFunction = {
+  generate: async (texts) => texts.map(() => [0.1, 0.2, 0.3, 0.4])
+};
 
-// 2. RAG Query Endpoint
 app.post('/api/ask', async (req, res) => {
-  const { question } = req.body;
-
-  if (!question) {
-    return res.status(400).json({ error: 'Please provide a "question" in the request body.' });
-  }
-
   try {
-    console.log(`🔍 Received Query: "${question}"`);
+    const { question } = req.body;
+    if (!question) {
+      return res.status(400).json({ error: 'Question is required' });
+    }
 
-    // Step A: Search ChromaDB for relevant document context
-    const collection = await chromaClient.getOrCreateCollection({ name: 'personal_knowledge' });
-    const searchResults = await collection.query({
-      queryTexts: [question],
-      nResults: 2 // Fetch top 2 most relevant matching text chunks
+    // Connect to the matching collection created during ingestion
+    const collection = await chroma.getOrCreateCollection({
+      name: 'rag_documents',
+      embeddingFunction: customEmbeddingFunction
     });
 
-    const retrievedContext = searchResults.documents[0]?.join('\n') || 'No relevant documents found.';
-    console.log(`📄 Retrieved Context from ChromaDB:\n${retrievedContext}\n`);
+    // Retrieve documents from ChromaDB
+    const searchResults = await collection.query({
+      queryTexts: [question],
+      nResults: 2
+    });
 
-    // Step B: Construct Grounded Prompt for Phi-3 (Ollama)
-    const augmentedPrompt = `
-You are a helpful Personal AI Knowledge Assistant. 
-Answer the user's question using ONLY the provided context below. If the context does not contain enough information, state clearly that you do not know based on the notes.
+    const contextDocs = searchResults.documents[0] ? searchResults.documents[0].join('\n') : '';
 
-CONTEXT:
-${retrievedContext}
+    // Construct augmented prompt
+    const augmentedPrompt = `Context:\n${contextDocs}\n\nQuestion: ${question}\n\nAnswer:`;
 
-QUESTION:
-${question}
-
-ANSWER:
-`;
-
-    // Step C: Send Context + Question to Ollama Container
-    const ollamaResponse = await axios.post(`${OLLAMA_URL}/api/generate`, {
+    // Query Ollama (Phi-3 model)
+    const ollamaResponse = await axios.post(`${OLLAMA_HOST}/api/generate`, {
       model: 'phi3',
       prompt: augmentedPrompt,
       stream: false
     });
 
-    // Step D: Send Final Grounded Answer Back to Client
-    return res.status(200).json({
-      question: question,
-      contextUsed: retrievedContext,
+    res.json({
+      question,
+      contextUsed: contextDocs,
       answer: ollamaResponse.data.response
     });
-
   } catch (error) {
-    console.error('❌ Error processing RAG request:', error.message);
-    return res.status(500).json({ 
-      error: 'Failed to process request', 
-      details: error.message 
+    console.error('RAG Query Error:', error.message);
+    res.status(500).json({
+      error: 'Failed to process request',
+      details: error.message
     });
   }
 });
