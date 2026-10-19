@@ -1,6 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import { ChromaClient } from 'chromadb';
+import { ollamaEmbeddingFunction } from './embeddings.js';
 
 const app = express();
 app.use(express.json());
@@ -10,11 +11,6 @@ const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://ollama:11434';
 const CHROMA_HOST = process.env.CHROMA_HOST || 'http://chromadb:8000';
 
 const chroma = new ChromaClient({ path: CHROMA_HOST });
-
-// Define matching embedding function structure
-const customEmbeddingFunction = {
-  generate: async (texts) => texts.map(() => [0.1, 0.2, 0.3, 0.4])
-};
 
 app.post('/api/ask', async (req, res) => {
   try {
@@ -26,7 +22,7 @@ app.post('/api/ask', async (req, res) => {
     // Connect to the matching collection created during ingestion
     const collection = await chroma.getOrCreateCollection({
       name: 'rag_documents',
-      embeddingFunction: customEmbeddingFunction
+      embeddingFunction: ollamaEmbeddingFunction
     });
 
     // Retrieve documents from ChromaDB

@@ -19,6 +19,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY package*.json ./
 COPY server.js ./
 COPY ingest.js ./
+COPY embeddings.js ./
 
 # Expose port for the Express server
 EXPOSE 3000
