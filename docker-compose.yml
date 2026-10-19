@@ -1,34 +1,34 @@
+version: '3.8'
+
 services:
-  app:
+  # 1. Express API Gateway & RAG Service
+  web:
     build: .
     ports:
       - "3000:3000"
     environment:
-      - PORT=3000
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_URL=http://ollama:11434
+      - CHROMA_URL=http://chromadb:8000
     depends_on:
       - ollama
-    restart: always
+      - chromadb
 
+  # 2. Local LLM Service
   ollama:
     image: ollama/ollama:latest
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-    restart: always
 
-  jenkins:
-    image: jenkins/jenkins:lts
+  # 3. Vector Database for Document Search
+  chromadb:
+    image: chromadb/chroma:latest
     ports:
-      - "8090:8080"
-      - "50000:50000"
+      - "8000:8000"
     volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    user: root
-    restart: always
+      - chroma_data:/chroma/chroma
 
 volumes:
   ollama_data:
-  jenkins_home:
+  chroma_data:
