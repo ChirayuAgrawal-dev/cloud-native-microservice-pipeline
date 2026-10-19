@@ -1,0 +1,131 @@
+
+CLOUD-NATIVE RAG MICROSERVICE PIPELINE
+======================================
+
+GitHub Repository:
+https://github.com/ChirayuAgrawal-dev/cloud-native-microservice-pipeline
+
+1. PROJECT OVERVIEW
+-------------------
+This project implements a Retrieval-Augmented Generation (RAG) question-answering service. It uses a Node.js and Express backend, ChromaDB for vector search, and Ollama for local language-model inference.
+
+2. TECHNOLOGY STACK
+-------------------
+- Node.js: JavaScript runtime
+- Express.js: REST API backend
+- Axios: HTTP communication with Ollama
+- ChromaDB: Vector database for semantic retrieval
+- Ollama: Local AI model execution
+- Phi-3: Generates answers
+- nomic-embed-text: Converts text into embeddings
+- Docker: Containerizes the application
+- Docker Compose: Runs the backend services together
+- Kubernetes and Minikube: Local container orchestration
+- Jenkins: CI/CD pipeline
+- Git and GitHub: Version control
+
+3. SYSTEM COMPONENTS
+--------------------
+A. Express Backend
+   Receives questions through POST /api/ask, retrieves relevant
+   documents, constructs an augmented prompt, and returns the
+   generated answer.
+
+B. ChromaDB
+   Stores document embeddings in the rag_documents collection
+   and retrieves relevant documents for incoming questions.
+
+C. Ollama
+   Runs phi3 for answer generation and nomic-embed-text for
+   creating document and query embeddings.
+
+D. embeddings.js
+   Provides a shared embedding function used by document
+   ingestion and question retrieval.
+
+E. ingest.js
+   Loads documents into ChromaDB so they can be retrieved later.
+
+F. Frontend Dashboard
+   The local development dashboard is available at port 8080
+   when the frontend service is configured and running.
+
+4. REQUEST FLOW
+---------------
+1. A user submits a question through the frontend.
+2. The frontend sends the question to POST /api/ask.
+3. Express validates the request.
+4. nomic-embed-text converts the question into an embedding.
+5. ChromaDB retrieves the two most relevant document results.
+6. Express combines the retrieved context with the question.
+7. Ollama runs Phi-3 to generate a response.
+8. Express returns the question, retrieved context, and answer.
+
+5. LOCAL SERVICES
+-----------------
+Frontend:   http://localhost:8080
+Express:    http://localhost:3000
+ChromaDB:   http://localhost:8000
+Ollama:     http://localhost:11434
+
+The frontend is a local development addition. The original
+repository backend documents the API rather than a root web page.
+
+6. CONFIGURATION
+----------------
+OLLAMA_HOST
+Default: http://ollama:11434
+
+CHROMA_HOST
+Default: http://chromadb:8000
+
+EMBED_MODEL
+Default: nomic-embed-text
+
+PORT
+Default: 3000
+
+Docker Compose service names should be used for communication
+between containers.
+
+7. DOCUMENT INGESTION
+---------------------
+Documents are embedded and stored in ChromaDB. During querying,
+the same embedding model must be used so document and question
+vectors have compatible dimensions.
+
+The original ingestion script includes sample documents and
+deletes the existing rag_documents collection before recreating
+it. Back up important data before running a destructive ingestion
+script.
+
+8. KUBERNETES
+-------------
+The repository includes k8s-deployment.yaml for the backend,
+ChromaDB, and Ollama workloads in Minikube.
+
+The repository documentation notes that its Ollama and ChromaDB
+storage uses emptyDir volumes. Data may be lost when the relevant
+pods are recreated.
+
+9. JENKINS CI/CD
+---------------
+The repository includes a declarative Jenkins pipeline.
+
+According to the repository README, checkout and build
+verification are documented stages. Image build/push and
+Kubernetes deployment stages are currently simulated and must
+be implemented before they can perform real automated deployment.
+
+10. LIMITATIONS
+---------------
+- RAG retrieves information; it does not automatically retrain
+  Phi-3 or provide continuous model learning.
+- Answer quality depends on the documents indexed in ChromaDB.
+- Retrieved context does not guarantee every generated claim
+  is factually supported.
+- The documented API endpoint is POST /api/ask.
+- Frontend availability depends on the local frontend setup.
+
+Repository documentation:
+https://github.com/ChirayuAgrawal-dev/cloud-native-microservice-pipeline

@@ -1,5 +1,8 @@
+ HEAD
 
 
+
+ 8bec0ea (Add Aurora AI frontend and improve RAG pipeline)
 # Cloud-Native AI Microservice & Automated CI/CD Pipeline
 
 A containerized Retrieval-Augmented Generation (RAG) microservice architecture integrating a Node.js/Express backend with a ChromaDB vector database and a local Large Language Model (LLM) inference engine (Ollama). The project features multi-container orchestration via Docker Compose, deployment of three cooperating services on a local Kubernetes (Minikube) cluster, and a Git-driven Jenkins CI/CD pipeline.

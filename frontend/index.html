@@ -1,0 +1,132 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d1d">
+<title>Aurora AI — Knowledge Workspace</title>
+<style>
+:root{color-scheme:dark;--bg:#080d1d;--panel:#101a32;--panel2:#131f3d;--line:#233354;--muted:#91a0c4;--text:#edf2ff;--purple:#8274ff;--cyan:#48d9ed;--green:#54e0b0;--red:#ff7e9a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% -10%,#28225a 0,transparent 40%),radial-gradient(ellipse at 5% 70%,#102a48 0,transparent 38%),var(--bg);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh}
+button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}.app{min-height:100vh}.topbar{height:76px;border-bottom:1px solid #253252;background:#0b1125d9;backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:4}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#7868ff,#26cde8);box-shadow:0 0 28px #6f62ff40;font-size:23px}.brand h1{font-size:17px;margin:0;letter-spacing:-.4px}.brand p{margin:1px 0 0;color:var(--muted);font-size:12px}
+.topright{display:flex;align-items:center;gap:14px}.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#121d37;padding:7px 11px;border-radius:99px;font-size:12px;color:#b8c5e8}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px #54e0b080}.avatar{width:36px;height:36px;display:grid;place-items:center;background:#242b50;border:1px solid #434775;border-radius:50%;font-weight:700}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 76px)}aside{padding:22px 14px;border-right:1px solid #202d4a;background:#0a1226a8;display:flex;flex-direction:column;gap:7px}
+.navbtn{display:flex;align-items:center;gap:12px;text-align:left;width:100%;border:1px solid transparent;background:transparent;padding:12px 13px;border-radius:12px;color:#aebcdd;transition:.2s}.navbtn .ico{width:22px;text-align:center;font-size:17px}.navbtn small{display:block;color:#7889b3;font-size:11px}.navbtn:hover{background:#131f3a;color:white}.navbtn.active{background:linear-gradient(110deg,#4e42bc80,#1e7b9b30);border-color:#6659d85c;color:white;box-shadow:inset 0 0 25px #685bff0b}
+.sidefoot{margin-top:auto;border:1px solid #27385a;border-radius:15px;padding:15px;background:linear-gradient(145deg,#18264a,#0d1930)}.sidefoot b{display:block;margin:5px 0}.sidefoot p{color:var(--muted);font-size:12px;margin:0}
+main{padding:26px;min-width:0;max-width:1700px;width:100%;margin:auto}.pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:22px}.eyebrow{color:#9b91ff;text-transform:uppercase;letter-spacing:1.8px;font-size:10px;font-weight:800}.pagehead h2{font-size:27px;letter-spacing:-1px;margin:5px 0}.pagehead p{color:var(--muted);margin:0;max-width:620px}.btn{border:1px solid #36476d;border-radius:11px;background:#182544;padding:10px 14px;transition:.2s}.btn:hover{border-color:#887bff;transform:translateY(-1px)}.btn.primary{border:0;background:linear-gradient(120deg,#7465f5,#4c8eff);box-shadow:0 8px 25px #6558e92c;font-weight:700}.btn:disabled{opacity:.5;cursor:wait;transform:none}
+.grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}.card{background:linear-gradient(145deg,#121d37eF,#0e1830f2);border:1px solid #263655;border-radius:17px;box-shadow:0 12px 32px #00000012;min-width:0}.stat{padding:17px}.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.stat-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#252552;color:#aaa0ff;font-size:17px}.stat strong{display:block;font-size:25px;margin:10px 0 0;letter-spacing:-.7px}.stat small{color:var(--muted);font-size:11px}
+.twocol{grid-template-columns:minmax(0,1.6fr) minmax(260px,.9fr)}.cardhead{padding:17px 19px;border-bottom:1px solid #253451;display:flex;justify-content:space-between;align-items:center;gap:10px}.cardhead h3{margin:0;font-size:14px}.cardbody{padding:18px}.hero{padding:24px;background:radial-gradient(ellipse at 90% 0,#214c7180,transparent 45%),linear-gradient(120deg,#1a2251,#102440);border:1px solid #394779;border-radius:17px;margin-bottom:17px;position:relative;overflow:hidden}.hero:after{content:"✳";position:absolute;right:25px;top:0;font-size:95px;color:#a9a0ff12}.hero h3{font-size:22px;margin:0 0 6px}.hero p{color:#bac8eb;margin:0;max-width:590px}.feature-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}.feature{background:#0b173a80;border:1px solid #394879;border-radius:10px;padding:8px 11px;font-size:11px;color:#c8d4f5}
+.chatbox{height:430px;overflow:auto;padding:17px;display:flex;flex-direction:column;gap:16px}.message{display:flex;gap:10px;max-width:88%;align-items:flex-start}.message.user{align-self:flex-end;flex-direction:row-reverse}.bubble{border:1px solid #2a3c60;background:#15213d;padding:12px 14px;border-radius:5px 15px 15px 15px;white-space:pre-wrap;overflow-wrap:anywhere}.user .bubble{background:linear-gradient(130deg,#403c98,#244b81);border-color:#5758b4;border-radius:15px 5px 15px 15px}.msgicon{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(140deg,#6d5aff,#28c4dc);color:white}.meta{font-size:10px;color:#8e9dc2;margin-top:7px}.context{margin-top:10px;border-top:1px solid #304365;padding-top:9px;color:#b9c8ed;font-size:12px}.context summary{cursor:pointer;color:#a99fff}.composer{border-top:1px solid #253451;padding:15px;display:flex;gap:10px;align-items:flex-end}.composer textarea{resize:vertical;min-height:46px;max-height:140px;flex:1;background:#0b1429;border:1px solid #33466c;border-radius:13px;padding:12px;color:white;outline:none}.composer textarea:focus,input:focus{border-color:#887bff;box-shadow:0 0 0 3px #8274ff18}.hint{font-size:11px;color:#7f90b9;padding:0 16px 13px}.suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}.suggestion{border:1px solid #34446b;background:#111d37;color:#bdc8e8;padding:8px 11px;border-radius:10px;font-size:12px}.suggestion:hover{border-color:#7e70f5;color:white}
+.stack{display:flex;flex-direction:column;gap:10px}.item{display:flex;gap:12px;align-items:center;padding:13px;border:1px solid #29395b;border-radius:12px;background:#111d36}.fileicon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:#173c58;color:#6ee2f3;font-size:18px}.itemmain{flex:1;min-width:0}.itemmain b{display:block;font-size:13px;overflow-wrap:anywhere}.itemmain small{display:block;color:var(--muted);font-size:11px}.status{font-size:11px;color:#b6c3e4;border:1px solid #35466c;border-radius:99px;padding:5px 8px;white-space:nowrap}.status.ok{color:var(--green);border-color:#256b5a;background:#12342f}.status.warn{color:#ffd18a;border-color:#775d35;background:#352916}
+.search{width:100%;background:#0b1429;border:1px solid #2e4167;border-radius:11px;padding:11px 13px;color:white;outline:none;margin-bottom:13px}.empty{padding:35px 20px;text-align:center;color:var(--muted)}.empty strong{display:block;color:#e0e7ff;margin-bottom:5px}.section{display:none}.section.active{display:block}.toast{position:fixed;right:22px;bottom:22px;background:#152443;border:1px solid #4a5f8c;border-radius:12px;padding:12px 16px;box-shadow:0 10px 40px #0008;z-index:10;max-width:350px}.muted{color:var(--muted)}.mono{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.progress{height:5px;background:#253454;border-radius:99px;overflow:hidden;margin-top:12px}.progress span{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--purple),var(--cyan))}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.twocol{grid-template-columns:1fr}.layout{grid-template-columns:76px minmax(0,1fr)}aside{padding:17px 9px}.navbtn{justify-content:center;padding:13px 4px}.navbtn .navtext,.sidefoot{display:none}.navbtn .ico{font-size:20px}.chatbox{height:400px}}
+@media(max-width:620px){.topbar{height:65px;padding:0 14px}.brand p,.topright .pill,.avatar{display:none}.layout{display:block}aside{position:sticky;top:65px;z-index:3;display:flex;flex-direction:row;justify-content:space-around;border-right:0;border-bottom:1px solid #202d4a;padding:6px;gap:3px}.navbtn{flex:1;display:grid;gap:2px;justify-items:center;padding:7px 2px;font-size:10px}.navbtn .navtext{display:block;text-align:center}.navbtn small{display:none}.navbtn .ico{font-size:17px}main{padding:17px 12px}.pagehead h2{font-size:23px}.stats{gap:9px}.stat{padding:12px}.stat strong{font-size:21px}.chatbox{height:52vh;padding:12px}.message{max-width:97%}.hero{padding:18px}.composer{padding:10px}.pagehead{align-items:center}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="logo">✳</div><div><h1>Aurora <span style="color:#a89dff">AI</span></h1><p>Private knowledge workspace</p></div></div>
+  <div class="topright"><span class="pill"><span class="dot"></span> Local AI stack</span><span class="avatar">CA</span></div>
+</header>
+<div class="layout">
+<aside>
+  <button class="navbtn active" data-page="chat"><span class="ico">◈</span><span class="navtext">AI Chat<small>Ask your knowledge base</small></span></button>
+  <button class="navbtn" data-page="knowledge"><span class="ico">▤</span><span class="navtext">Knowledge Base<small>Document manifest</small></span></button>
+  <button class="navbtn" data-page="history"><span class="ico">◷</span><span class="navtext">Query History<small>Saved in this browser</small></span></button>
+  <button class="navbtn" data-page="infra"><span class="ico">⌘</span><span class="navtext">Infrastructure<small>Service overview</small></span></button>
+  <div class="sidefoot"><div style="font-size:23px;color:#9b8dff">✧</div><b>Grounded answers</b><p>Answers are generated using the context retrieved by your RAG API.</p></div>
+</aside>
+<main>
+<section id="page-chat" class="section active">
+  <div class="pagehead"><div><div class="eyebrow">Your AI workspace</div><h2>Knowledge, connected.</h2><p>Ask a question and explore the context your local RAG pipeline retrieves.</p></div><span class="pill">✦ Phi-3 · Ollama</span></div>
+  <div class="stats">
+    <div class="card stat"><div class="stat-top">Saved queries <span class="stat-icon">◷</span></div><strong id="statQueries">0</strong><small>Stored in this browser</small></div>
+    <div class="card stat"><div class="stat-top">Retrieval depth <span class="stat-icon">⌕</span></div><strong>Top 2</strong><small>Matches requested by API</small></div>
+    <div class="card stat"><div class="stat-top">Answer model <span class="stat-icon">✳</span></div><strong style="font-size:20px">Phi-3</strong><small>Served by Ollama</small></div>
+    <div class="card stat"><div class="stat-top">Vector collection <span class="stat-icon">▦</span></div><strong style="font-size:19px">rag_documents</strong><small>Configured collection name</small></div>
+  </div>
+  <div class="hero"><div class="eyebrow">AURORA / RAG ASSISTANT</div><h3>Good questions deserve grounded answers.</h3><p>Ask about the documents already indexed in ChromaDB. Expand the context under any answer to inspect the retrieved text returned by the API.</p><div class="feature-row"><span class="feature">✧ Context-aware answers</span><span class="feature">◉ Local inference</span><span class="feature">⌁ Source context visible</span></div></div>
+  <div class="grid twocol">
+    <div class="card">
+      <div class="cardhead"><h3>Conversation</h3><button id="clearChat" class="btn">New chat</button></div>
+      <div id="messages" class="chatbox" aria-live="polite">
+        <div class="message"><div class="msgicon">✳</div><div class="bubble">Welcome to Aurora AI. 👋<br><br>Ask me about the documents indexed in your RAG knowledge base. I'll show the answer and the retrieved context returned by your API.<div class="meta">Aurora AI · Ready</div></div></div>
+      </div>
+      <div class="composer"><textarea id="question" maxlength="2000" placeholder="Ask something about your indexed documents…" aria-label="Your question"></textarea><button id="send" class="btn primary">➤ Send</button></div>
+      <div class="hint">Enter to send · Shift + Enter for a new line · First model response may take a while.</div>
+    </div>
+    <div class="card"><div class="cardhead"><h3>Try asking</h3><span class="muted">Examples</span></div><div class="cardbody"><div id="suggestions" class="stack">
+      <button class="suggestion" data-q="What technologies power this RAG project?">What technologies power this RAG project?</button>
+      <button class="suggestion" data-q="How does retrieval-augmented generation work here?">How does RAG work here?</button>
+      <button class="suggestion" data-q="Explain how Docker and Kubernetes are used in this project.">How are Docker and Kubernetes used?</button>
+      <button class="suggestion" data-q="What is stored in the rag_documents collection?">What is in the knowledge collection?</button>
+    </div><div style="margin-top:22px;border-top:1px solid #29395b;padding-top:17px"><div class="eyebrow">HOW IT WORKS</div><div class="stack" style="margin-top:10px">
+      <div class="item"><div class="fileicon">01</div><div class="itemmain"><b>Your question</b><small>Sent to Express at /api/ask</small></div></div>
+      <div class="item"><div class="fileicon">02</div><div class="itemmain"><b>Semantic retrieval</b><small>ChromaDB returns up to two matches</small></div></div>
+      <div class="item"><div class="fileicon">03</div><div class="itemmain"><b>Generated answer</b><small>Ollama Phi-3 uses retrieved context</small></div></div>
+    </div></div></div></div>
+  </div>
+</section>
+
+<section id="page-knowledge" class="section">
+  <div class="pagehead"><div><div class="eyebrow">Your indexed content</div><h2>Knowledge Base</h2><p>Sample document entries defined in your repository's ingestion script. This view is a manifest, not a live ChromaDB listing.</p></div><span class="pill">Read-only manifest</span></div>
+  <div class="card"><div class="cardhead"><h3>Ingestion manifest</h3><span class="status warn">Live listing not available</span></div><div class="cardbody"><input id="docSearch" class="search" placeholder="Search document names, topics or text…" aria-label="Search sample documents"><div id="docs" class="stack"></div><p class="muted" style="font-size:12px;margin:16px 0 0">To upload files from this screen or list actual stored records, we would need to add document management endpoints to Express.</p></div></div>
+</section>
+
+<section id="page-history" class="section">
+  <div class="pagehead"><div><div class="eyebrow">Your recent activity</div><h2>Query History</h2><p>Questions and answers saved locally in this browser. They are not stored on the server.</p></div><button id="clearHistory" class="btn">Clear history</button></div>
+  <div class="card"><div class="cardhead"><h3>Recent queries</h3><span id="historyCount" class="muted">0 items</span></div><div class="cardbody"><input id="historySearch" class="search" placeholder="Search your history…" aria-label="Search history"><div id="historyList" class="stack"></div></div></div>
+</section>
+
+<section id="page-infra" class="section">
+  <div class="pagehead"><div><div class="eyebrow">Runtime overview</div><h2>Infrastructure</h2><p>Deployment configuration based on your repository. Live health is shown only when a health endpoint is available.</p></div><span class="pill">Docker / Minikube</span></div>
+  <div class="hero"><div class="eyebrow">CURRENT LIMITATION</div><h3>Configuration is not the same as health.</h3><p>Your Express app currently exposes <code>POST /api/ask</code>, but no dedicated health endpoint. This dashboard will not claim that ChromaDB, Ollama or Kubernetes are healthy without a real check.</p></div>
+  <div class="card"><div class="cardhead"><h3>Configured components</h3><span class="status warn">Health not verified</span></div><div class="cardbody stack" id="services"></div></div>
+  <div class="card" style="margin-top:16px"><div class="cardhead"><h3>API contract</h3><span class="status">From server.js</span></div><div class="cardbody"><p class="muted">Method and route</p><div class="mono">POST /api/ask</div><p class="muted">Request body</p><div class="mono">{"question":"Your question"}</div><p class="muted">Expected response fields</p><div class="mono">question · contextUsed · answer</div></div></div>
+</section>
+</main>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const docs=[
+ {id:"doc1",name:"Profile",source:"profile",text:"Chirayu Agrawal is described in the sample ingestion data as a B.Tech Computer Science and Engineering student.",type:"Sample profile"},
+ {id:"doc2",name:"Skills and cloud-native work",source:"skills",text:"The sample data mentions React, Node.js, Docker and Kubernetes.",type:"Sample skills"},
+ {id:"doc3",name:"Cloud-native RAG project",source:"project",text:"The ccd-microservice project uses Express, ChromaDB, Ollama and the Phi-3 model.",type:"Project note"},
+ {id:"doc4",name:"Computer vision projects",source:"projects",text:"The sample data mentions an ANPR number-plate project using YOLO.",type:"Sample projects"},
+ {id:"doc5",name:"University information",source:"college",text:"The sample ingestion script includes information about MIT World Peace University in Pune.",type:"Institution note"}
+];
+const services=[
+ {name:"Express RAG API",detail:"POST /api/ask · container port 3000",icon:"⌘"},
+ {name:"ChromaDB",detail:"Vector database · container port 8000",icon:"▦"},
+ {name:"Ollama / Phi-3",detail:"Local LLM inference · port 11434",icon:"✳"},
+ {name:"nomic-embed-text",detail:"Embedding model served by Ollama",icon:"⌁"},
+ {name:"Docker Compose",detail:"Local multi-container orchestration",icon:"◫"},
+ {name:"Minikube / Kubernetes",detail:"Deployment configuration exists in repository",icon:"☸"},
+ {name:"Jenkins",detail:"CI pipeline includes simulated build/deploy stages",icon:"⟳"}
+];
+const readHistory=()=>{try{return JSON.parse(localStorage.getItem("aurora-history")||"[]")}catch{return []}};
+const saveHistory=h=>{localStorage.setItem("aurora-history",JSON.stringify(h.slice(0,100)));renderHistory();updateStats()};
+function updateStats(){$("#statQueries").textContent=readHistory().length}
+function toast(msg){let t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.append(t);setTimeout(()=>t.remove(),3800)}
+function nav(page){document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id==="page-"+page));if(page==="history")renderHistory();if(page==="knowledge")renderDocs();if(page==="infra")renderServices()}
+document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.page)));
+function addMessage(text,who,context){let wrap=document.createElement("div");wrap.className="message "+(who==="user"?"user":"");let icon=document.createElement("div");icon.className="msgicon";icon.textContent=who==="user"?"CA":"✳";let bubble=document.createElement("div");bubble.className="bubble";bubble.textContent=text;if(context){let details=document.createElement("details");details.className="context";let summary=document.createElement("summary");summary.textContent="Inspect retrieved context";let pre=document.createElement("div");pre.style.cssText="white-space:pre-wrap;margin-top:8px;color:#c2d1ef";pre.textContent=context;details.append(summary,pre);bubble.append(details)}let meta=document.createElement("div");meta.className="meta";meta.textContent=(who==="user"?"You":"Aurora AI")+" · "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});bubble.append(meta);wrap.append(icon,bubble);$("#messages").append(wrap);$("#messages").scrollTop=$("#messages").scrollHeight;return wrap}
+async function ask(question){question=question.trim();if(!question)return;$("#question").value="";addMessage(question,"user");const btn=$("#send");btn.disabled=true;btn.textContent="…";const waiting=addMessage("Searching the knowledge base and generating an answer…","ai");try{const response=await fetch("/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});let data;try{data=await response.json()}catch{throw new Error("The API returned a response that was not JSON.")}if(!response.ok)throw new Error(data.details||data.error||"Request failed with HTTP "+response.status);if(typeof data.answer!=="string")throw new Error("The API response did not include an answer field.");waiting.remove();addMessage(data.answer,"ai",data.contextUsed||"No retrieved context was returned.");let h=readHistory();h.unshift({id:Date.now(),question,answer:data.answer,context:data.contextUsed||"",at:new Date().toISOString()});saveHistory(h);toast("Answer received from the RAG API.");}catch(e){waiting.remove();addMessage("I couldn't get an answer from the API.\n\n"+e.message+"\n\nCheck that Docker Compose is running and that the frontend proxy can reach the web service.","ai");toast("API request failed. Check your services and logs.");}finally{btn.disabled=false;btn.textContent="➤ Send"}}
+$("#send").addEventListener("click",()=>ask($("#question").value));
+$("#question").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask($("#question").value)}});
+document.querySelectorAll("[data-q]").forEach(b=>b.addEventListener("click",()=>ask(b.dataset.q)));
+$("#clearChat").addEventListener("click",()=>{$("#messages").replaceChildren();addMessage("New conversation started. What would you like to know?","ai")});
+function renderDocs(){let q=($("#docSearch").value||"").toLowerCase();let host=$("#docs");host.replaceChildren();let filtered=docs.filter(d=>(d.name+" "+d.source+" "+d.text).toLowerCase().includes(q));if(!filtered.length){host.innerHTML='<div class="empty"><strong>No matching sample documents</strong>Try another search term.</div>';return}filtered.forEach(d=>{let row=document.createElement("div");row.className="item";let ico=document.createElement("div");ico.className="fileicon";ico.textContent="▤";let body=document.createElement("div");body.className="itemmain";let b=document.createElement("b");b.textContent=d.name;let sm=document.createElement("small");sm.textContent=d.text;let meta=document.createElement("small");meta.style.marginTop="5px";meta.textContent="ID: "+d.id+" · metadata source: "+d.source;body.append(b,sm,meta);let tag=document.createElement("span");tag.className="status";tag.textContent="Manifest";row.append(ico,body,tag);host.append(row)})}
+$("#docSearch").addEventListener("input",renderDocs);
+function renderHistory(){let h=readHistory(),q=($("#historySearch").value||"").toLowerCase(),host=$("#historyList");$("#historyCount").textContent=h.length+" items";host.replaceChildren();let list=h.filter(x=>(x.question+" "+x.answer).toLowerCase().includes(q));if(!list.length){host.innerHTML='<div class="empty"><strong>No saved queries found</strong>Ask a question in AI Chat and it will appear here.</div>';return}list.forEach(x=>{let row=document.createElement("div");row.className="item";let ico=document.createElement("div");ico.className="fileicon";ico.textContent="◷";let body=document.createElement("div");body.className="itemmain";let b=document.createElement("b");b.textContent=x.question;let sm=document.createElement("small");sm.textContent=new Date(x.at).toLocaleString();let ans=document.createElement("small");ans.style.marginTop="7px";ans.textContent=x.answer;body.append(b,sm,ans);let open=document.createElement("button");open.className="btn";open.textContent="Ask again";open.addEventListener("click",()=>{nav("chat");ask(x.question)});row.append(ico,body,open);host.append(row)})}
+$("#historySearch").addEventListener("input",renderHistory);
+$("#clearHistory").addEventListener("click",()=>{if(confirm("Delete query history saved in this browser?")){localStorage.removeItem("aurora-history");renderHistory();updateStats()}});
+function renderServices(){let host=$("#services");host.replaceChildren();services.forEach(s=>{let row=document.createElement("div");row.className="item";let ico=document.createElement("div");ico.className="fileicon";ico.textContent=s.icon;let body=document.createElement("div");body.className="itemmain";let b=document.createElement("b");b.textContent=s.name;let sm=document.createElement("small");sm.textContent=s.detail;body.append(b,sm);let tag=document.createElement("span");tag.className="status warn";tag.textContent="Not verified";row.append(ico,body,tag);host.append(row)})}
+renderDocs();renderHistory();renderServices();updateStats();
+</script>
+</body>
+</html>
