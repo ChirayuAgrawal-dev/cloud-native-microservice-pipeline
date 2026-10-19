@@ -1,44 +1,42 @@
 import { ChromaClient } from 'chromadb';
 
-// Connect to ChromaDB (uses environment variable if running inside container, or localhost if running manually)
-const chromaUrl = process.env.CHROMA_URL || 'http://localhost:8000';
-const client = new ChromaClient({ path: chromaUrl });
-
 async function runIngestion() {
-  console.log('🔄 Connecting to ChromaDB...');
+    console.log("🔄 Connecting to ChromaDB...");
+    
+    // Connect pointing to the Docker service name 'chromadb' on port 8000
+    const client = new ChromaClient({
+        path: "http://chromadb:8000"
+    });
 
-  // 1. Create or get a collection named "personal_knowledge"
-  const collection = await client.getOrCreateCollection({
-    name: "personal_knowledge"
-  });
+    try {
+        // Create or get collection with a custom trivial embedding function to bypass external module errors, 
+        // or let Chroma handle it if embeddings are passed manually. 
+        // Here we use a basic embedding function or pass pre-computed dummy vectors for local RAG testing.
+        const collection = await client.getOrCreateCollection({
+            name: "rag_documents",
+            embeddingFunction: {
+                generate: async (texts) => {
+                    // Simple mock embedding generator for local testing 
+                    // (Returns a fake vector array for each text string)
+                    return texts.map(() => [0.1, 0.2, 0.3, 0.4]);
+                }
+            }
+        });
 
-  // 2. Define your sample notes/documents to ingest
-  const sampleKnowledge = [
-    {
-      id: "doc1",
-      text: "Chirayu Agrawal is pursuing a Bachelor of Technology in Computer Science and Engineering at MIT World Peace University in Pune."
-    },
-    {
-      id: "doc2",
-      text: "The Cloud & DevOps project uses a Node.js Express backend, ChromaDB for vector retrieval, Ollama with Phi-3 for local AI inference, and Jenkins for CI/CD automation."
-    },
-    {
-      id: "doc3",
-      text: "Kubernetes liveness probes check if the microservice is healthy, while readiness probes ensure the container is ready to accept incoming user traffic."
+        console.log("📥 Adding documents to collection...");
+        await collection.add({
+            ids: ["doc1", "doc2"],
+            documents: [
+                "Chirayu Agrawal is 20 years old, pursuing a B.Tech in Computer Science and Engineering at MIT World Peace University (2024-2028), specializing in Self-supervised Continual Domain Adaptation.",
+                "Chirayu resides in Pune, builds full-stack web applications with React and Node.js, and creates cloud-native microservices using Docker and Kubernetes."
+            ],
+            metadatas: [{ source: "profile" }, { source: "skills" }]
+        });
+
+        console.log("✅ Ingestion completed successfully!");
+    } catch (error) {
+        console.error("❌ Ingestion Error:", error);
     }
-  ];
-
-  console.log('📌 Ingesting documents into ChromaDB vector store...');
-
-  // 3. Store documents into the collection
-  await collection.add({
-    ids: sampleKnowledge.map(doc => doc.id),
-    documents: sampleKnowledge.map(doc => doc.text)
-  });
-
-  console.log('✅ Ingestion complete! Knowledge base is updated.');
 }
 
-runIngestion().catch((err) => {
-  console.error('❌ Ingestion Error:', err);
-});
+runIngestion();
