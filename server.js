@@ -47,7 +47,7 @@ app.post('/api/ask', async (req, res) => {
     // Retrieve more relevant chunks for broader questions.
     const searchResults = await collection.query({
       queryTexts: [question],
-      nResults: 4,
+      nResults: 2,
       include: ['documents', 'metadatas', 'distances']
     });
 
@@ -56,10 +56,8 @@ app.post('/api/ask', async (req, res) => {
 
     const contextDocs = documents
       .map((document, index) => {
-        const source =
-          metadatas[index]?.source || 'Unknown source';
-
-        return `[Source: ${source}]\n${document}`;
+       const source = metadatas[index]?.source || 'Unknown source';
+       return `[Source: ${source}]\n${document.slice(0, 1200)}`;
       })
       .join('\n\n---\n\n');
 
@@ -70,19 +68,18 @@ app.post('/api/ask', async (req, res) => {
       });
     }
 
-    const augmentedPrompt = `
-You are a technical assistant explaining the Cloud-Native RAG Microservice Pipeline.
+    
+const augmentedPrompt = `
+You are a question-answering assistant for a document retrieval system.
 
-Answer the user's question using the supplied CONTEXT.
-
-Rules:
-- Treat the context as the source of truth.
-- Do not invent technologies, files, endpoints, features, or deployment behavior.
-- If a detail is not supported by the context, explicitly say that the documentation does not specify it.
-- Explain technical concepts clearly and organize multi-part answers with headings or numbered steps when useful.
-- Distinguish implemented functionality from simulated or planned functionality.
-- Use source names in the context to identify where information came from.
-- Do not claim that you performed actions or tested anything.
+RULES:
+- Answer only from the supplied CONTEXT.
+- Never invent facts or use unrelated meanings of terms.
+- If the context does not contain the answer, explicitly say:
+  "The indexed documents do not contain enough information to answer this."
+- Give at most 3 short bullet points.
+- Keep the answer under 70 words.
+- Do not repeat the question.
 
 CONTEXT:
 ${contextDocs}
@@ -90,22 +87,22 @@ ${contextDocs}
 USER QUESTION:
 ${question}
 
-GROUNDED ANSWER:
+ANSWER:
 `.trim();
-
-    const ollamaResponse = await axios.post(
-      `${OLLAMA_HOST}/api/generate`,
-      {
-        model: 'phi3',
-        prompt: augmentedPrompt,
-        stream: false,
-        options: {
-          temperature: 0.2
-        }
-      },
-      { timeout: 120000 }
-    );
-
+    
+const ollamaResponse = await axios.post(
+  `${OLLAMA_HOST}/api/generate`,
+  {
+    model: 'phi3',
+    prompt: augmentedPrompt,
+    stream: false,
+    options: {
+      temperature: 0.1,
+      num_predict: 120
+    }
+  },
+  { timeout: 240000 }
+);
     res.json({
       question,
       contextUsed: contextDocs,

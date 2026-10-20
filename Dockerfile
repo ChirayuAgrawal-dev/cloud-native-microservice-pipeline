@@ -20,6 +20,7 @@ COPY package*.json ./
 COPY server.js ./
 COPY ingest.js ./
 COPY embeddings.js ./
+COPY documents/ ./documents/
 
 # Expose port for the Express server
 EXPOSE 3000
