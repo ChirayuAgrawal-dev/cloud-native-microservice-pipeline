@@ -98,10 +98,10 @@ const ollamaResponse = await axios.post(
     stream: false,
     options: {
       temperature: 0.1,
-      num_predict: 120
+      num_predict: 100
     }
   },
-  { timeout: 240000 }
+  { timeout: 120000 }
 );
     res.json({
       question,
