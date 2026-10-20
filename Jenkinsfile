@@ -1,46 +1,60 @@
+
 pipeline {
     agent any
-    
-    environment {
-        DOCKER_CREDS_ID = 'dockerhub-credentials-id' 
-        IMAGE_NAME = 'chirayu27/ccd-microservice'
-        TAG = "${env.BUILD_NUMBER}"
+
+    tools {
+        nodejs 'NodeJS18'
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
     }
 
     stages {
         stage('1. Checkout Code') {
             steps {
-                echo 'Checking out source code from Git SCM repository...'
                 checkout scm
             }
         }
 
-        stage('2. Build Verification') {
+        stage('2. Verify Environment') {
             steps {
-                echo 'Validating workspace structure and deployment manifests...'
-                sh 'ls -la'
+                sh 'node --version'
+                sh 'npm --version'
             }
         }
 
-        stage('3. Build & Push Container Image') {
+        stage('3. Install Dependencies') {
             steps {
-                echo "Simulating container image build for ${IMAGE_NAME}:${TAG}..."
+                sh 'npm install --no-audit --no-fund'
             }
         }
 
-        stage('4. Automated Deploy to Kubernetes') {
+        stage('4. Validate Source') {
             steps {
-                echo "Rolling out deployment update to Minikube cluster for image version ${TAG}..."
+                sh 'node --check server.js'
+                sh 'node --check ingest.js'
+                sh 'node --check embeddings.js'
+                sh 'test -f Dockerfile'
+                sh 'test -f k8s-deployment.yaml'
+                sh 'test -f package.json'
+                echo 'Source and required deployment files validated.'
             }
         }
     }
 
     post {
         success {
-            echo 'CI/CD Pipeline executed successfully! Microservice status: HEALTHY'
+            echo 'CI checks passed. No deployment was performed.'
         }
+
         failure {
-            echo 'Pipeline execution failed. Check console logs for details.'
+            echo 'CI checks failed. Review the console output.'
+        }
+
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
