@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 # --- Stage 2: Production Run Stage ---
-FROM node:20-alpine runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
