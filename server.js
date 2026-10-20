@@ -101,7 +101,7 @@ const ollamaResponse = await axios.post(
       num_predict: 100
     }
   },
-  { timeout: 120000 }
+  { timeout: 300000 }
 );
     res.json({
       question,
