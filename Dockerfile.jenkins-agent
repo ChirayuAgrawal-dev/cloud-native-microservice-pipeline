@@ -5,18 +5,23 @@ FROM jenkins/inbound-agent:jdk21
 
 USER root
 
-# Install Node.js 20 and npm
+# Install Node.js, npm, curl, and trusted certificate utilities
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends nodejs npm \
+    && apt-get install -y --no-install-recommends \
+       nodejs npm ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Add Docker CLI
 COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
 
-# Verify required tools
+# Trust the Minikube certificate authority
+COPY minikube-ca.crt /usr/local/share/ca-certificates/minikube-ca.crt
+RUN update-ca-certificates
+
+# Verify required tools are installed
 RUN node --version \
     && npm --version \
-    && docker --version
+    && docker --version \
+    && curl --version
 
 USER jenkins
-
