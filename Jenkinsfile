@@ -1,5 +1,6 @@
 
 
+
 pipeline {
     agent {
         label 'docker-build'
@@ -25,13 +26,12 @@ pipeline {
 
         stage('Verify Build Agent') {
             steps {
-                echo 'Checking Node.js, npm, and Docker...'
+                echo 'Checking Linux build agent...'
                 sh '''
                     set -eu
                     echo "Agent: $(hostname)"
                     node --version
                     npm --version
-                    docker version
                 '''
             }
         }
@@ -73,45 +73,61 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh '''
-                    set -eu
-                    docker build \
-                      --tag "${IMAGE_NAME}:${IMAGE_TAG}" \
-                      .
-                    echo "Docker image built successfully."
-                '''
-            }
-        }
-
-        stage('Verify Docker Image') {
-            steps {
-                sh '''
-                    set -eu
-                    docker image inspect \
-                      "${IMAGE_NAME}:${IMAGE_TAG}" \
-                      --format 'Image ID: {{.Id}}'
-                    docker image ls "${IMAGE_NAME}:${IMAGE_TAG}"
-                '''
-            }
-        }
-
-        stage('Deploy to Minikube') {
+        stage('Build and Deploy to Minikube') {
             agent {
                 label 'windows-deploy'
             }
+
             steps {
-                // This workspace belongs to the Windows agent.
+                // The Windows agent has its own workspace.
                 checkout scm
 
-                echo 'Deploying the verified image to Minikube...'
+                echo 'Checking Docker and Kubernetes on Windows...'
+
+                powershell '''
+                    $ErrorActionPreference = "Stop"
+
+                    docker version
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Docker daemon is unavailable to the Windows agent."
+                    }
+
+                    minikube status
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Minikube is not ready."
+                    }
+
+                    kubectl get deployment ccd-web
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Kubernetes deployment ccd-web was not found."
+                    }
+                '''
+
+                echo 'Building and verifying Docker image...'
+
+                powershell '''
+                    $ErrorActionPreference = "Stop"
+
+                    $image = "$env:IMAGE_NAME`:$env:IMAGE_TAG"
+
+                    docker build --tag $image .
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Docker image build failed."
+                    }
+
+                    docker image inspect $image
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Built Docker image could not be verified."
+                    }
+                '''
+
+                echo 'Loading image and deploying to Minikube...'
 
                 powershell '''
                     $ErrorActionPreference = "Stop"
 
                     if (-not (Test-Path ".\\deploy.ps1")) {
-                        throw "deploy.ps1 was not found in the checked-out workspace."
+                        throw "deploy.ps1 was not found."
                     }
 
                     & ".\\deploy.ps1"
@@ -126,11 +142,11 @@ pipeline {
 
     post {
         success {
-            echo 'CI, Docker image build, and deployment completed successfully.'
+            echo 'Code validation, Docker build, and Minikube deployment completed successfully.'
         }
 
         failure {
-            echo 'Pipeline failed. Check the stage logs above.'
+            echo 'Pipeline failed. Inspect the stage logs for the failing step.'
         }
 
         always {
